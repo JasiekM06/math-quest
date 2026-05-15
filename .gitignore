@@ -4,10 +4,24 @@ backend/**/obj/
 backend/**/*.user
 backend/**/.vs/
 
+backend/**/*.suo
+backend/**/*.userosscache
+backend/**/*.sln.docstates
+backend/**/TestResults/
+backend/**/*.log
+
 # Node / React
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+
+frontend/.env.local
+frontend/.env.*.local
+frontend/build/
+
+# ENV (globalne pliki środowiskowe)
+.env
+.env.*
 
 # macOS
 .DS_Store
