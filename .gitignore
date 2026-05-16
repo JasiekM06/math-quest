@@ -10,6 +10,16 @@ backend/**/*.sln.docstates
 backend/**/TestResults/
 backend/**/*.log
 
+backend/MathQuest.Api/mathquest.db
+backend/MathQuest.Api/*.lscache
+
+
+# SQLite Database
+backend/**/*.db
+backend/**/*.db-shm
+backend/**/*.db-wal
+
+
 # Node / React
 frontend/node_modules/
 frontend/dist/
@@ -19,13 +29,16 @@ frontend/.env.local
 frontend/.env.*.local
 frontend/build/
 
+
 # ENV (globalne pliki środowiskowe)
 .env
 .env.*
 
+
 # macOS
 .DS_Store
 **/.DS_Store
+
 
 # VS Code
 .vscode/
