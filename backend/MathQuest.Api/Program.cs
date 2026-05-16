@@ -7,7 +7,17 @@ builder.Services.AddDbContext<MathQuestContext>(options => options.UseSqlite("Da
 
 // Włączenie Swaggera
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "MathQuest API",
+        Version = "v1",
+        Description = "API do aplikacji z zadaniami matematycznymi dla dzieci"
+    });
+});
+
+builder.Services.AddControllers(); // rejestruje system Controllerów w dependency injection
 
 var app = builder.Build(); // Buduje gotową aplikację
 
@@ -18,6 +28,7 @@ if (app.Environment.IsDevelopment()) // Włącza Swaggera tylko w trybie dewelop
 }
 
 app.UseHttpsRedirection(); // Jeśli ktoś wejdzie przez http://, automatycznie zostaje przekierowany na https://
+app.MapControllers(); // Mówi aplikacji, eby zmapowała wszystkie endpointy znalezione w Controllerach na odpowiednie adresy URL
 
 app.MapGet("/", () => "MathQuest API działa!");
 
