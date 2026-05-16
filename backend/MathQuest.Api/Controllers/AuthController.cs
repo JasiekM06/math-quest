@@ -1,9 +1,12 @@
-using System.Data;
 using MathQuest.Api.Data;
 using MathQuest.Api.DTOs;
 using MathQuest.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace MathQuest.Api.Controllers;
 
@@ -12,10 +15,12 @@ namespace MathQuest.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly MathQuestContext _db;
+    private readonly IConfiguration _config;
 
-    public AuthController(MathQuestContext db)
+    public AuthController(MathQuestContext db, IConfiguration config)
     {
         _db = db;
+        _config = config; // Przechowujemy konfigurację, zeby móc odczytać klucz JWT
     }
 
     // Endpoint rejestracji
@@ -64,6 +69,36 @@ public class AuthController : ControllerBase
         if (!passwordValid)
             return Unauthorized("Nieprawidłowa nazwa uzytkownika lub hasło.");
 
-        return Ok(new { userId = user.UserId, username = user.Username }); // Zwracamy anonimowy obiekt z danymi uytkownika bez PasswordHash!
+        var token = GenerateJwtToken(user);
+        return Ok(new { userId = user.UserId, username = user.Username, token = token }); // Zwracamy anonimowy obiekt z danymi uytkownika bez PasswordHash!
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        // Pobieramy klucz z konfiguracji i tworzymy obiekt klucza
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+
+        // Określamy algorytm podpisywania tokena
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        // Claim to informacje które pakujemy do tokena
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()), // Sub (Subject) - kto jest właścicielem tokena, zapisujemy ID uzytkownika
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username), // UniqueName - nazwa uzytkownika, frontend moze ją odczytać z tokena
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Jti (JWT ID) - unikalny identyfikator tego konkretnego tokena, zapobiega duplikatom
+        };
+
+        // Tworzymy token z wszystkimi parametrami
+        var token = new JwtSecurityToken(
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(24), // Token wygasa po 24 godzinach
+            signingCredentials: creds
+        );
+
+        // Zamieniamy token na string, który wysyłamy do frontendu
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
