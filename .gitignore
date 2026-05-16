@@ -9,9 +9,9 @@ backend/**/*.userosscache
 backend/**/*.sln.docstates
 backend/**/TestResults/
 backend/**/*.log
-
-backend/MathQuest.Api/mathquest.db
 backend/MathQuest.Api/*.lscache
+backend/**/appsettings.Local.json
+
 
 
 # SQLite Database
@@ -24,20 +24,24 @@ backend/**/*.db-wal
 frontend/node_modules/
 frontend/dist/
 frontend/.env
-
 frontend/.env.local
 frontend/.env.*.local
 frontend/build/
+frontend/.vite/
+frontend/.eslintcache
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
 
 
 # ENV (globalne pliki środowiskowe)
 .env
 .env.*
 
-
+g
 # macOS
 .DS_Store
 **/.DS_Store
+**/._*
 
 
 # VS Code
